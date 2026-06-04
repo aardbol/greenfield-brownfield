@@ -138,6 +138,7 @@ helm install deployment-app ./helm --namespace sre-interview \
 | `pdb.enabled` | `false` | PodDisruptionBudget — enable for HA when replicaCount > 1 |
 
 ## Prerequisites
+- GitHub Actions configured (optional — see CI workflows below)
 
 - **OpenTofu >= 1.11**
 - **Helm >= 3.0**
@@ -152,3 +153,35 @@ helm install deployment-app ./helm --namespace sre-interview \
 4. **Official upstream modules** — We wrap well-maintained community modules rather than writing raw resources
 5. **Per-module READMEs** — Each module documents its own variables, outputs, and usage
 6. **Optional NetworkPolicy** — Restricts pod access to only the ingress controller and DNS, gated by `networkPolicy.enabled` to avoid breaking clusters without a CNI that enforces policies
+
+## CI Workflows
+
+Two GitHub Actions workflows run on pull requests and pushes to `main`:
+
+### `.github/workflows/tofu-validate.yaml`
+
+| Job | What it does |
+|-----|-------------|
+| `fmt` | `tofu fmt -check -recursive .` — fails on unformatted code |
+| `validate-modules` | `tofu init && tofu validate` for each module (4 matrix jobs: aws vpc/k8s, gcp vpc/k8s) |
+| `validate-deployments` | `tofu init && tofu validate` for each deployment (4 matrix jobs: acmecorp aws/gcp, othercorp aws/gcp). Continues on error — deployments require `.tfvars` to fully validate |
+
+### `.github/workflows/helm-lint.yaml`
+
+| Job | What it does |
+|-----|-------------|
+| `lint` | `helm lint .` — chart structure and values validation |
+| `template` | Renders the chart under 3 scenarios (default, full-turbo with ingress/HPA/NetworkPolicy/PDB, resource bump) to catch template errors |
+| `kubeconform` | Pipes rendered templates through `kubeconform` against K8s 1.32 to validate against the Kubernetes schema |
+
+### Running locally
+
+```bash
+# OpenTofu
+tofu fmt -check -recursive opentofu/
+tofu init -backend=false opentofu/modules/aws/vpc && tofu validate opentofu/modules/aws/vpc
+
+# Helm
+helm lint helm/
+helm template test-release helm/ | kubeconform --kubernetes-version 1.34.0 --strict --ignore-missing-schemas
+```
