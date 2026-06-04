@@ -1,0 +1,7 @@
+customer_name = "acmecorp"
+
+tags = {
+  environment = "production"
+  customer    = "acmecorp"
+  managed_by  = "opentofu"
+}

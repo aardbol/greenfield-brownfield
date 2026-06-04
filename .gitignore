@@ -23,7 +23,4 @@ override.tf.json
 # Include example tfvars
 !terraform.tfvars.example
 
-# Binary
-*.terraform.lock.hcl
-
 .idea/
