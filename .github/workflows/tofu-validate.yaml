@@ -1,0 +1,83 @@
+name: OpenTofu Validate
+
+on:
+  pull_request:
+    paths:
+      - 'opentofu/**'
+  push:
+    branches: [main]
+    paths:
+      - 'opentofu/**'
+
+env:
+  TOFU_VERSION: "1.11.0"
+
+jobs:
+  fmt:
+    name: Format Check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Install OpenTofu
+        run: |
+          curl -fsSL https://get.opentofu.org/install-opentofu.sh | sudo bash -s -- --install-method standalone --opentofu-version ${{ env.TOFU_VERSION }}
+          tofu --version
+
+      - name: tofu fmt check
+        run: |
+          cd opentofu
+          tofu fmt -check -recursive .
+
+  validate-modules:
+    name: Validate Modules
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        module:
+          - modules/aws/vpc
+          - modules/aws/kubernetes
+          - modules/gcp/vpc
+          - modules/gcp/kubernetes
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Install OpenTofu
+        run: |
+          curl -fsSL https://get.opentofu.org/install-opentofu.sh | sudo bash -s -- --install-method standalone --opentofu-version ${{ env.TOFU_VERSION }}
+          tofu --version
+
+      - name: tofu init
+        working-directory: opentofu/${{ matrix.module }}
+        run: tofu init -backend=false
+
+      - name: tofu validate
+        working-directory: opentofu/${{ matrix.module }}
+        run: tofu validate
+
+  validate-deployments:
+    name: Validate Deployments
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        deployment:
+          - deployments/customer-acmecorp/aws
+          - deployments/customer-acmecorp/gcp
+          - deployments/customer-othercorp/aws
+          - deployments/customer-othercorp/gcp
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Install OpenTofu
+        run: |
+          curl -fsSL https://get.opentofu.org/install-opentofu.sh | sudo bash -s -- --install-method standalone --opentofu-version ${{ env.TOFU_VERSION }}
+          tofu --version
+
+      - name: tofu init
+        working-directory: opentofu/${{ matrix.deployment }}
+        run: tofu init -backend=false
+
+      - name: tofu validate
+        working-directory: opentofu/${{ matrix.deployment }}
+        run: tofu validate
+        continue-on-error: true
