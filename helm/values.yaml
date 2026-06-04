@@ -3,7 +3,7 @@ replicaCount: 1
 
 # -- Image configuration
 image:
-  repository: ghcr.io/e2b-dev/deployment-app
+  repository: ghcr.io/e2b-dev/sre-interview
   tag: latest
   pullPolicy: Always
 
