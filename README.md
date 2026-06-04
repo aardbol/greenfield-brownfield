@@ -124,7 +124,7 @@ helm install deployment-app ./helm --namespace sre-interview \
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `image.repository` | `ghcr.io/e2b-dev/deployment-app` | Container image |
+| `image.repository` | `ghcr.io/e2b-dev/sre-interview` | Container image |
 | `image.tag` | `latest` | Image tag |
 | `replicaCount` | `1` | Pod replicas |
 | `resources.requests` | CPU 256m, Memory 256Mi | Resource requests |
