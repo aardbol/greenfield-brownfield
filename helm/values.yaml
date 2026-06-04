@@ -1,0 +1,141 @@
+# -- Number of replicas
+replicaCount: 1
+
+# -- Image configuration
+image:
+  repository: ghcr.io/e2b-dev/deployment-app
+  tag: latest
+  pullPolicy: Always
+
+# -- Image pull secrets (if pulling from a private registry)
+imagePullSecrets: []
+
+# -- Override the name of the chart
+nameOverride: ""
+# -- Override the full name of the release
+fullnameOverride: ""
+
+# -- Service account configuration
+serviceAccount:
+  # -- Create a service account for the pod
+  create: false
+  # -- Annotations to attach to the SA
+  annotations: {}
+  # -- Explicit SA name (mutually exclusive with create)
+  name: ""
+  # -- Whether to automount the service account token
+  automountToken: false
+
+# -- Annotations to attach to the pod
+podAnnotations: {}
+
+# -- Pod-level security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  runAsGroup: 65534
+  fsGroup: 65534
+
+# -- Container-level security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+  readOnlyRootFilesystem: true
+
+pdb:
+  enabled: false
+  minAvailable: 1
+
+# -- Service configuration
+service:
+  # -- Kubernetes service type (ClusterIP, NodePort, LoadBalancer)
+  type: ClusterIP
+  # -- Service port
+  port: 8080
+
+# -- Ingress configuration
+# Disabled by default — enable when an ingress controller (e.g. Traefik) is installed.
+# The default annotations are Traefik-friendly; override as needed.
+ingress:
+  enabled: false
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - app.example.com
+      secretName: deployment-app-tls
+
+# -- NetworkPolicy configuration
+# Disabled by default — enable when using a CNI that enforces NetworkPolicies (e.g. Calico, Cilium).
+# When enabled, only the ingress controller and kubelet health checks can reach the pod.
+networkPolicy:
+  enabled: false
+  # -- Pod selector labels for the ingress controller (default Traefik)
+  ingressControllerLabels:
+    app.kubernetes.io/name: traefik
+  # -- Allow health check probes from anywhere (e.g. kubelet)
+  allowHealthCheckFromAnywhere: true
+  # -- Extra ingress rules to append
+  extraIngressRules: []
+  # - ports:
+  #     - port: 9090
+  #   from:
+  #     - ipBlock:
+  #         cidr: 0.0.0.0/0
+  # -- Extra egress rules to append
+  extraEgressRules: []
+  # - ports:
+  #     - port: 443
+  #       protocol: TCP
+  #   to:
+  #     - ipBlock:
+  #         cidr: 0.0.0.0/0
+
+# -- Resource requests and limits for the container
+resources:
+  requests:
+    cpu: 256m
+    memory: 256Mi
+  limits:
+    # No CPU limit to avoid constant throttling
+    memory: 1Gi
+
+# -- Horizontal Pod Autoscaler (disabled by default — opt in per workload)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# -- Node selector for pod scheduling
+nodeSelector: {}
+
+# -- Tolerations for pod scheduling
+tolerations: []
+
+# -- Affinity rules for pod scheduling
+affinity: {}
+
+# -- Environment variables for the container
+env: []
+#  - name: FOO
+#    value: bar
+
+# -- Additional volumes to mount
+volumes: []
+#  - name: config
+#    configMap:
+#      name: deployment-app-config
+
+# -- Additional volume mounts
+volumeMounts: []
+#  - name: config
+#    mountPath: /etc/config

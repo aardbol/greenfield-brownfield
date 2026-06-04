@@ -1,0 +1,11 @@
+customer_name = "othercorp"
+
+existing_vpc_id = "vpc-xxxxxxxxxxxxxxxxx"
+# Leave empty to auto-discover by EKS tags:
+# existing_private_subnet_ids = ["subnet-xxxxxxxxx", "subnet-yyyyyyyyy"]
+
+tags = {
+  environment = "production"
+  customer    = "othercorp"
+  managed_by  = "opentofu"
+}

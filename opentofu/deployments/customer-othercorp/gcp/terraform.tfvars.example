@@ -1,0 +1,24 @@
+project_id = "my-gcp-project"
+region     = "europe-west1"
+customer_name = "othercorp"
+
+existing_network_name         = "my-existing-vpc"
+existing_private_subnet_names = ["my-existing-private-subnet-1", "my-existing-private-subnet-2"]
+existing_public_subnet_names  = ["my-existing-public-subnet-1", "my-existing-public-subnet-2"]
+
+gke_release_channel    = "STABLE"
+gke_kubernetes_version = "latest"
+
+# Private nodes (requires Cloud NAT configured on the existing VPC)
+gke_private_nodes = true
+
+# If the existing subnet already has secondary IP ranges for pods/services,
+# provide their names here. Otherwise leave null for GKE auto-allocation.
+# ip_range_pods_name     = "gke-pods"
+# ip_range_services_name = "gke-services"
+
+tags = {
+  environment = "production"
+  customer    = "othercorp"
+  managed_by  = "opentofu"
+}

@@ -1,0 +1,11 @@
+apiVersion: v2
+name: deployment-app
+description: Helm chart for the deployment app using the greenfield-brownfield approach
+type: application
+version: 0.1.0
+appVersion: latest
+kubeVersion: ">=1.28.0"
+home: https://github.com/aardbol/greenfield-brownfield
+maintainers:
+  - name: aardbol
+    email: aardbol@sre.dev
