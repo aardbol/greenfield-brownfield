@@ -147,7 +147,7 @@ variable "cloud_nat_log_type" {
 
 variable "enable_flow_log" {
   type        = bool
-  default     = false
+  default     = true
   description = "Enable VPC Flow Log to Cloud Logging"
 }
 
