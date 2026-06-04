@@ -18,7 +18,7 @@ fullnameOverride: ""
 # -- Service account configuration
 serviceAccount:
   # -- Create a service account for the pod
-  create: false
+  create: true
   # -- Annotations to attach to the SA
   annotations: {}
   # -- Explicit SA name (mutually exclusive with create)
